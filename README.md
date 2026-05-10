@@ -2,13 +2,14 @@
 Skript for converting ip66.dev geoip database to a CSV format suitable for OpnSense
 
 
-You can run this on any server using python3 with an installed maxminddb package (pip install maxminddb) like so:
+You can run this on any server using python3 with an installed maxminddb package (`pip install maxminddb`) like so:
 
-python3 opnsense-ip66.py
+`python3 opnsense-ip66.py`
 
 You should modify the TARGET_GZIP to the path your webserver can serve. Also note that in order for your webserver to serve the file correctly,
 it must hand out a "Content-Disposition" HTTP header. For NGinx, this can be done like so:
 
+```
 location ~* \.gz$ {
     # Extrahiert den Dateinamen aus dem Pfad (z.B. "ipinfo_lite.csv.gz")
     if ($request_filename ~* ^.*/(.+\.gz)$ ) {
@@ -22,9 +23,11 @@ location ~* \.gz$ {
     types { }
     default_type application/gzip;
 }
+```
 
 and for Apache, like so:
 
+```
 <FilesMatch "\.gz$">
     # Extrahiert den Dateinamen aus dem Pfad und speichert ihn in der Variable MATCHED_FILENAME
     SetEnvIf Request_URI "([^/]+\.gz)$" MATCHED_FILENAME=$1
@@ -35,5 +38,6 @@ and for Apache, like so:
     # Sicherstellen, dass der Content-Type für Gzip korrekt ist
     ForceType application/gzip
 </FilesMatch>
+```
 
 Then, use your webserver URL in OpnSense's Firewall->Aliases->GeoIP settings. You may have to use the "Actions" button to actually apply the setting.
